@@ -13,8 +13,10 @@
 
 #import "SBSAccessibilityWindowHostingController.h"
 #import "UIWindow+Private.h"
+#import <notify.h>
 
 @implementation HUDMainApplicationDelegate {
+    int _visibilityToggleToken;
     HUDRootViewController *_rootViewController;
     SBSAccessibilityWindowHostingController *_windowHostingController;
 }
@@ -57,7 +59,29 @@
     [invocation invoke];
 #pragma clang diagnostic pop
 
+    // Register for HUD visibility toggle notification
+    __weak typeof(self) weakSelf = self;
+    notify_register_dispatch([kToggleHUDVisibilityNotificationName UTF8String], &_visibilityToggleToken, dispatch_get_main_queue(), ^(int token) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf handleVisibilityToggleNotification];
+        }
+    });
+
     return YES;
+}
+
+- (void)handleVisibilityToggleNotification {
+    log_debug(OS_LOG_DEFAULT, "- [HUDMainApplicationDelegate handleVisibilityToggleNotification]");
+    self.window.hidden = !self.window.hidden;
+    log_info(OS_LOG_DEFAULT, "HUD window visibility toggled to: %{public}s", self.window.hidden ? "Hidden" : "Visible");
+}
+
+- (void)dealloc {
+    if (_visibilityToggleToken) {
+        notify_cancel(_visibilityToggleToken);
+    }
+    log_debug(OS_LOG_DEFAULT, "- [HUDMainApplicationDelegate dealloc]");
 }
 
 @end

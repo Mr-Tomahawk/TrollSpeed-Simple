@@ -17,6 +17,9 @@
 // #import "AXEventRepresentation.h" // Removed as _HUDEventCallback was removed
 #import "UIApplication+Private.h"
 
+#import "MainApplication.h"         // Added for custom application class
+#import "MainApplicationDelegate.h" // Added for custom app delegate (already used by name)
+
 #define PID_PATH "/var/mobile/Library/Caches/com.user.redsquarehud.pid" // Updated bundle ID
 
 // Removed unused mDeviceModel function
@@ -32,7 +35,7 @@ int main(int argc, char *argv[])
         log_debug(OS_LOG_DEFAULT, "launched argc %{public}d, argv[1] %{public}s", argc, argc > 1 ? argv[1] : "NULL");
 
         if (argc <= 1) {
-            return UIApplicationMain(argc, argv, nil, @"MainApplicationDelegate"); // Use default UIApplication
+            return UIApplicationMain(argc, argv, NSStringFromClass([MainApplication class]), NSStringFromClass([MainApplicationDelegate class]));
         }
 
         NSString *pidPath;
@@ -76,6 +79,10 @@ int main(int argc, char *argv[])
             }
 
             [UIApplication.sharedApplication __completeAndRunAsPlugin];
+
+            // Notify the launcher that the HUD has successfully launched
+            log_debug(OS_LOG_DEFAULT, "HUD process posting NOTIFY_LAUNCHED_HUD");
+            notify_post(NOTIFY_LAUNCHED_HUD);
 
             // Removed SBSpringBoardDidLaunchNotification handler block for simplicity
             // static int _springboardBootToken;

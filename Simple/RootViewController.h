@@ -10,9 +10,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Notification constants from Speed/sources/MainApplication.h
+static NSString * const kToggleHUDAfterLaunchNotificationName = @"ch.xxtou.hudapp.notification.toggle-hud";
+static NSString * const kToggleHUDAfterLaunchNotificationActionKey = @"action";
+static NSString * const kToggleHUDAfterLaunchNotificationActionToggleOn = @"toggle_on";
+static NSString * const kToggleHUDAfterLaunchNotificationActionToggleOff = @"toggle_off";
+
 @interface RootViewController : UIViewController // Removed <TSSettingsControllerDelegate>
 @property (nonatomic, strong) UIView *backgroundView;
-// + (void)setShouldToggleHUDAfterLaunch:(BOOL)flag; // Removed as URL/Shortcut handling was removed
++ (void)setShouldToggleHUDAfterLaunch:(BOOL)flag;
++ (BOOL)shouldToggleHUDAfterLaunch;
 - (void)reloadMainButtonState;
 @end
 

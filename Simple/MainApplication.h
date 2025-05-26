@@ -7,7 +7,11 @@
 
 #import <UIKit/UIKit.h>
 
-// Notification constants are defined globally in RedSquareHUD-Prefix.pch
+// Notification constants are defined in RootViewController.h or RedSquareHUD-Prefix.pch
+// static NSString * const kToggleHUDAfterLaunchNotificationName = @"ch.xxtou.hudapp.notification.toggle-hud";
+// static NSString * const kToggleHUDAfterLaunchNotificationActionKey = @"action";
+// static NSString * const kToggleHUDAfterLaunchNotificationActionToggleOn = @"toggle-on";
+// static NSString * const kToggleHUDAfterLaunchNotificationActionToggleOff = @"toggle-off";
 
 NS_ASSUME_NONNULL_BEGIN
 

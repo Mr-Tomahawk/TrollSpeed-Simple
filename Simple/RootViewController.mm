@@ -14,23 +14,23 @@
 
 #define HUD_TRANSITION_DURATION 0.25
 
-// static BOOL _gShouldToggleHUDAfterLaunch = NO; // Removed
+static BOOL _shouldToggleHUDAfterLaunch = NO; // Added static variable
 
 @implementation RootViewController {
-    MainButton *_mainButton;
-    BOOL _isRemoteHUDActive; // Kept for now, usage might simplify after AppDelegate changes
+    MainButton *_mainButton; // Declare _mainButton ivar
+    BOOL _isRemoteHUDActive;
     UIImpactFeedbackGenerator *_impactFeedbackGenerator;
+    // UIView *_backgroundView; // This is a property now
 }
 
-// + (void)setShouldToggleHUDAfterLaunch:(BOOL)flag
-// {
-//     _gShouldToggleHUDAfterLaunch = flag;
-// }
+// Correct placement for static method implementations
++ (void)setShouldToggleHUDAfterLaunch:(BOOL)flag {
+    _shouldToggleHUDAfterLaunch = flag;
+}
 
-// + (BOOL)shouldToggleHUDAfterLaunch
-// {
-//     return _gShouldToggleHUDAfterLaunch;
-// }
++ (BOOL)shouldToggleHUDAfterLaunch {
+    return _shouldToggleHUDAfterLaunch;
+}
 
 - (BOOL)isHUDEnabled
 {
@@ -42,23 +42,26 @@
     SetHUDEnabled(enabled);
 }
 
-// - (void)registerNotifications
-// {
-//     // URL scheme/shortcut toggling removed
-//     // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleHUDNotificationReceived:) name:kToggleHUDAfterLaunchNotificationName object:nil];
-// }
-
 - (void)loadView
 {
     CGRect bounds = UIScreen.mainScreen.bounds;
 
     self.view = [[UIView alloc] initWithFrame:bounds];
-    // Set a simple background color
-    self.view.backgroundColor = [UIColor systemBackgroundColor];
+    self.view.backgroundColor = [UIColor colorWithRed:0.0f / 255.0f green:0.0f / 255.0f blue:0.0f / 255.0f alpha:.580f / 1.0f]; // From Speed
 
-    // Keep main button only
+    self.backgroundView = [[UIView alloc] initWithFrame:bounds];
+    self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.backgroundView.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) { // From Speed
+        if ([traitCollection userInterfaceStyle] == UIUserInterfaceStyleDark) {
+            return [UIColor colorWithRed:28/255.0 green:74/255.0 blue:82/255.0 alpha:1.0];
+        } else {
+            return [UIColor colorWithRed:26/255.0 green:188/255.0 blue:156/255.0 alpha:1.0];
+        }
+    }];
+    [self.view addSubview:self.backgroundView];
+
     _mainButton = [MainButton buttonWithType:UIButtonTypeSystem];
-    [_mainButton setTintColor:[UIColor labelColor]]; // Use dynamic color
+    [_mainButton setTintColor:[UIColor whiteColor]]; // From Speed (buttons are on dark background)
     [_mainButton addTarget:self action:@selector(tapMainButton:) forControlEvents:UIControlEventTouchUpInside];
     if (@available(iOS 15.0, *))
     {
@@ -75,58 +78,94 @@
     {
         [_mainButton.titleLabel setFont:[UIFont boldSystemFontOfSize:32.0]];
     }
-    [self.view addSubview:_mainButton]; // Add to self.view directly
+    [self.backgroundView addSubview:_mainButton]; // Add to backgroundView
 
-    UILayoutGuide *safeArea = self.view.safeAreaLayoutGuide; // Use self.view safe area
+    UILayoutGuide *safeArea = self.backgroundView.safeAreaLayoutGuide; // Use backgroundView safe area
     [_mainButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [NSLayoutConstraint activateConstraints:@[
         [_mainButton.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
-        [_mainButton.centerYAnchor constraintEqualToAnchor:safeArea.centerYAnchor], // Center in safe area
+        [_mainButton.centerYAnchor constraintEqualToAnchor:safeArea.centerYAnchor],
     ]];
-
-    [self reloadMainButtonState];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    // Setup 3-finger tap gesture for HUD visibility toggle
+    UITapGestureRecognizer *toggleHudGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleHudVisibilityToggleGesture:)];
+    toggleHudGesture.numberOfTouchesRequired = 3;
+    toggleHudGesture.numberOfTapsRequired = 1;
+    [self.view addGestureRecognizer:toggleHudGesture];
+
     _impactFeedbackGenerator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
-    // [self registerNotifications]; // Removed
+    [self reloadMainButtonState];
+    [self registerNotifications];
 }
+
+// Method to handle the 3-finger tap gesture
+- (void)handleHudVisibilityToggleGesture:(UITapGestureRecognizer *)gesture {
+    if (gesture.state == UIGestureRecognizerStateEnded) {
+        NSLog(@"[Simple] 3-finger tap detected, posting notification to toggle HUD visibility.");
+        notify_post([kToggleHUDVisibilityNotificationName UTF8String]);
+    }
+}
+
+- (void)registerNotifications
+{
+    int token;
+    // NOTIFY_RELOAD_APP is defined in RedSquareHUD-Prefix.pch
+    notify_register_dispatch(NOTIFY_RELOAD_APP, &token, dispatch_get_main_queue(), ^(int t) {
+        // For Simple, just reload the button state, as there are no extensive user defaults like in Speed
+        [self reloadMainButtonState];
+    });
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleHUDNotificationReceived:) name:kToggleHUDAfterLaunchNotificationName object:nil];
+}
+
+- (void)toggleHUDNotificationReceived:(NSNotification *)notification {
+    // Simplified for Simple: always toggle the current state
+    // NSString *toggleAction = notification.userInfo[kToggleHUDAfterLaunchNotificationActionKey];
+    log_debug(OS_LOG_DEFAULT, "- [RootViewController toggleHUDNotificationReceived:%{public}@ userInfo:%{public}@", notification.name, notification.userInfo);
+    
+    // Directly toggle the HUD state, similar to tapMainButton but without sender
+    BOOL isCurrentlyEnabled = [self isHUDEnabled];
+    [self setHUDEnabled:!isCurrentlyEnabled];
+    
+    // Optionally, trigger feedback and UI update if needed, or rely on tapMainButton's logic if it's called by this.
+    // For now, just reload state, tapMainButton handles the complex feedback/timeout.
+    [self reloadMainButtonState]; 
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    // notify_cancel should be handled for the specific token if stored, 
+    // but for NOTIFY_RELOAD_APP, the token from notify_register_dispatch is local to registerNotifications.
+    // If we stored the token as an ivar, we would cancel it here.
+}
+
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    // [self toggleHUDAfterLaunch]; // Removed URL scheme/shortcut handling
+    // No automatic toggle on appear for Simple
 }
-
-// --- URL Scheme/Shortcut Handling Removed ---
-// - (void)toggleHUDNotificationReceived:(NSNotification *)notification {
-//     // ...
-// }
-
-// - (void)toggleHUDAfterLaunch {
-//     // ...
-// }
-
-// - (void)toggleOnHUDAfterLaunch {
-//     // ...
-// }
-
-// - (void)toggleOffHUDAfterLaunch {
-//     // ...
-// }
-// --- End URL Scheme/Shortcut Handling ---
 
 
 // Simplified reloadMainButtonState
 - (void)reloadMainButtonState
 {
     _isRemoteHUDActive = [self isHUDEnabled];
-    // Only update the button title
-     __weak typeof(self) weakSelf = self;
-    [UIView transitionWithView:_mainButton duration:HUD_TRANSITION_DURATION options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-         __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf->_mainButton setTitle:(strongSelf->_isRemoteHUDActive ? NSLocalizedString(@"Exit HUD", nil) : NSLocalizedString(@"Open HUD", nil)) forState:UIControlStateNormal];
-    } completion:nil];
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf || !strongSelf->_mainButton) { // Added check for _mainButton
+            return;
+        }
+        [UIView transitionWithView:strongSelf->_mainButton duration:HUD_TRANSITION_DURATION options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+            __strong typeof(weakSelf) animationStrongSelf = weakSelf;
+            if (!animationStrongSelf || !animationStrongSelf->_mainButton) return;
+            [animationStrongSelf->_mainButton setTitle:(animationStrongSelf->_isRemoteHUDActive ? NSLocalizedString(@"Exit HUD", nil) : NSLocalizedString(@"Open HUD", nil)) forState:UIControlStateNormal];
+        } completion:nil];
+    });
 }
 
 
@@ -136,46 +175,46 @@
 
     BOOL isNowEnabled = [self isHUDEnabled];
     [self setHUDEnabled:!isNowEnabled];
-    isNowEnabled = !isNowEnabled; // Update state after toggling
+    // isNowEnabled = !isNowEnabled; // This was potentially confusing, _isRemoteHUDActive is updated by reloadMainButtonState
 
-    // Keep feedback and state update logic, simplify UI interaction part
-    if (isNowEnabled)
+    // Get the new state *after* toggling for the UI logic
+    BOOL newTargetState = !isNowEnabled; 
+
+    if (newTargetState) // If HUD is being turned ON
     {
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-
         [_impactFeedbackGenerator prepare];
         int anyToken;
         __weak typeof(self) weakSelf = self;
         notify_register_dispatch(NOTIFY_LAUNCHED_HUD, &anyToken, dispatch_get_main_queue(), ^(int token) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) { notify_cancel(token); return; }
             notify_cancel(token);
             [strongSelf->_impactFeedbackGenerator impactOccurred];
             dispatch_semaphore_signal(semaphore);
         });
 
-        // Disable button temporarily? Or rely on async update?
-        // sender.enabled = NO;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+        self.view.userInteractionEnabled = NO;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
             intptr_t timedOut = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)));
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (timedOut) {
                     log_error(OS_LOG_DEFAULT, "Timed out waiting for HUD to launch");
                 }
+                self.view.userInteractionEnabled = YES;
                 [self reloadMainButtonState];
-                // sender.enabled = YES;
             });
         });
     }
-    else
+    else // If HUD is being turned OFF
     {
-        // sender.enabled = NO;
+        self.view.userInteractionEnabled = NO;
+        // No NOTIFY_EXITED_HUD in Simple's HUD process, so just use a delay
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            self.view.userInteractionEnabled = YES;
             [self reloadMainButtonState];
-            // sender.enabled = YES;
         });
     }
 }
-
-// Removed unused methods
 
 @end

@@ -21,9 +21,10 @@
 
 // Define Notification names if needed
 // #define NOTIFY_RELOAD_HUD "com.user.redsquarehud.reloadhud" // Removed
-// #define NOTIFY_RELOAD_APP "com.user.redsquarehud.reloadapp" // Removed
+#define NOTIFY_RELOAD_APP "com.user.redsquarehud.reloadapp"
 #define NOTIFY_LAUNCHED_HUD "com.user.redsquarehud.launchedhud"
 #define NOTIFY_DISMISSAL_HUD "com.user.redsquarehud.dismissalhud"
+static NSString * const kToggleHUDVisibilityNotificationName = @"com.yourcompany.simplehud.toggleVisibility";
 // #define kToggleHUDAfterLaunchNotificationName @"com.user.redsquarehud.toggleAfterLaunch" // Removed
 // #define kToggleHUDAfterLaunchNotificationActionKey @"action" // Removed
 // #define kToggleHUDAfterLaunchNotificationActionToggleOn @"on" // Removed

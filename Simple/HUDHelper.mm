@@ -102,6 +102,7 @@ void SetHUDEnabled(BOOL isEnabled)
         }
 
         posix_spawnattr_destroy(&attr);
+        // free(executablePath); // Static variable, should not be freed here if intended for reuse across calls
 
         if (rc != 0) {
             return;

@@ -1,7 +1,3 @@
-# Claude-related files
-.claude/
-.claude*
-
 # Theos
 .theos/
 packages/*.deb

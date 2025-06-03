@@ -5,6 +5,7 @@
 #import "MainButton.h"
 #import "RootViewController.h"
 #import "UIApplication+Private.h"
+#import "Memory.h"
 
 #define HUD_TRANSITION_DURATION 0.25
 
@@ -111,18 +112,86 @@ static BOOL _shouldToggleHUDAfterLaunch = NO;
 
 - (void)tapMainButton:(UIButton *)sender
 {
-    log_debug(OS_LOG_DEFAULT, "- [RootViewController tapMainButton:%{public}@]", sender);
+    os_log_debug(OS_LOG_DEFAULT, "- [RootViewController tapMainButton:%{public}@", sender);
 
-    BOOL isCurrentlyEnabled = [self isHUDEnabled];
-    [self setHUDEnabled:!isCurrentlyEnabled];
-    
-    [_impactFeedbackGenerator impactOccurred];
-    
-    self.view.userInteractionEnabled = NO;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.view.userInteractionEnabled = YES;
-        [self reloadMainButtonState];
-    });
+    UIAlertController *inputAlert = [UIAlertController alertControllerWithTitle:@"Enter App Name"
+                                                                       message:@"Please enter the process name (e.g., Facebook)"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+                                                                
+    [inputAlert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = @"Process name";
+    }];
+
+    UIAlertAction *submitAction = [UIAlertAction actionWithTitle:@"Submit"
+                                                           style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction * _Nonnull action) {
+    NSString *appName = inputAlert.textFields.firstObject.text;
+
+    if (appName.length == 0) {
+        [self showErrorAlert:@"You must enter a process name."];
+        return;
+    }
+
+    MemoryUtils *utils = [[MemoryUtils alloc] initWithProcessName:appName];
+    if (!utils.valid) { 
+        [self showErrorAlert:[NSString stringWithFormat:@"Failed to find or access process: %@. Check permissions and if the app is running.", appName]];
+        return;
+    }
+
+    NSString *infoMessage;
+
+    if (utils && utils.valid) { 
+        NSError *readError = nil;
+        // Reading an Int32 as Mach-O signature. Common signatures are 0xfeedface, 0xfeedfacf, 0xcafebabe etc.
+        uint32_t machoSig = [utils readUInt32AtAddress:utils.baseAddress error:&readError]; 
+        if (readError) {
+            [self showErrorAlert:[NSString stringWithFormat:@"Failed to read Mach-O signature: %@", readError.localizedDescription]];
+            return;
+        }
+        infoMessage = [NSString stringWithFormat:
+                        @"Process: %@ (PID: %d)\nBase Address: 0x%llx\nMach-O Signature: 0x%08x\n\nToggle HUD?",
+                        utils.processName, utils.processID, utils.baseAddress, machoSig];
+        } else {
+            // This case should ideally be caught by the '!utils.valid' check above.
+            infoMessage = @"Failed to open process or retrieve base address.";
+        }
+        
+        UIAlertController *infoAlert = [UIAlertController alertControllerWithTitle:@"Process Info"
+                                                                           message:infoMessage
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+        
+
+        [infoAlert addAction:[UIAlertAction actionWithTitle:@"Toggle HUD" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            BOOL isCurrentlyEnabled = [self isHUDEnabled];
+            [self setHUDEnabled:!isCurrentlyEnabled];
+            
+            if (self->_impactFeedbackGenerator) {
+                [self->_impactFeedbackGenerator impactOccurred];
+            }
+            
+            self.view.userInteractionEnabled = NO;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.view.userInteractionEnabled = YES;
+                [self reloadMainButtonState];
+            });
+        }]];
+        
+        [infoAlert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        
+        [self presentViewController:infoAlert animated:YES completion:nil];
+    }];
+
+    [inputAlert addAction:submitAction];
+    [inputAlert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:inputAlert animated:YES completion:nil];
+}
+
+- (void)showErrorAlert:(NSString *)message {
+    UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                        message:message
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+    [errorAlert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:errorAlert animated:YES completion:nil];
 }
 
 + (void)setShouldToggleHUDAfterLaunch:(BOOL)shouldToggle {

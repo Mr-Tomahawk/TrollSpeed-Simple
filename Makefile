@@ -14,7 +14,8 @@ RedSquareHUD_FILES = main.mm \
 	Launcher/RootViewController.mm \
 	Launcher/MainApplicationDelegate.mm \
 	UI/MainButton.mm \
-	Utils/HUDHelper.mm
+	Utils/HUDHelper.mm \
+	Utils/Memory.mm
 RedSquareHUD_CFLAGS += -fobjc-arc -Iheaders -IHUD -ILauncher -IUI -IUtils -include RedSquareHUD-Prefix.pch
 
 RedSquareHUD_FRAMEWORKS = CoreGraphics CoreServices QuartzCore IOKit UIKit Foundation

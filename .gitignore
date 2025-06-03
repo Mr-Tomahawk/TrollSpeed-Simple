@@ -1,0 +1,14 @@
+# Claude-related files
+.claude/
+.claude*
+
+# Theos
+.theos/
+packages/*.deb
+
+# macOS
+.DS_Store
+
+# Build artifacts
+*.o
+*.dylib

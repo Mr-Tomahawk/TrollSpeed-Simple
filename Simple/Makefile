@@ -6,9 +6,16 @@ include $(THEOS)/makefiles/common.mk
 
 APPLICATION_NAME = RedSquareHUD
 
-RedSquareHUD_FILES = main.mm HUDRootViewController.mm HUDMainWindow.mm HUDMainApplicationDelegate.mm HUDHelper.mm RootViewController.mm MainApplicationDelegate.mm MainButton.mm MainApplication.mm HUDMainApplication.mm # Removed Swift files
-RedSquareHUD_CFLAGS += -fobjc-arc -Iheaders -include RedSquareHUD-Prefix.pch
-# RedSquareHUD_SWIFT_BRIDGING_HEADER = RedSquareHUD-Bridging-Header.h # Removed Swift bridging header
+RedSquareHUD_FILES = main.mm \
+	HUD/HUDRootViewController.mm \
+	HUD/HUDMainWindow.mm \
+	HUD/HUDMainApplicationDelegate.mm \
+	HUD/HUDMainApplication.mm \
+	Launcher/RootViewController.mm \
+	Launcher/MainApplicationDelegate.mm \
+	UI/MainButton.mm \
+	Utils/HUDHelper.mm
+RedSquareHUD_CFLAGS += -fobjc-arc -Iheaders -IHUD -ILauncher -IUI -IUtils -include RedSquareHUD-Prefix.pch
 
 RedSquareHUD_FRAMEWORKS = CoreGraphics CoreServices QuartzCore IOKit UIKit Foundation
 RedSquareHUD_PRIVATE_FRAMEWORKS = BackBoardServices GraphicsServices SpringBoardServices AccessibilityUtilities # Add others if needed

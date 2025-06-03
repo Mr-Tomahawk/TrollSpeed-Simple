@@ -1,16 +1,7 @@
-//
-//  HUDHelper.mm
-//  TrollSpeed
-//
-//  Created by Lessica on 2024/1/24.
-//
-
 #import <spawn.h>
 #import <notify.h>
 #import <mach-o/dyld.h>
-
 #import "HUDHelper.h"
-// #import "NSUserDefaults+Private.h" // Removed as GetStandardUserDefaults is removed
 
 extern "C" char **environ;
 
@@ -63,8 +54,6 @@ BOOL IsHUDEnabled(void)
     return WEXITSTATUS(status) != 0;
 }
 
-// #define LAUNCH_DAEMON_PATH JBROOT_PATH_CSTRING("/Library/LaunchDaemons/ch.xxtou.hudservices.plist") // Removed LaunchDaemon logic
-
 void SetHUDEnabled(BOOL isEnabled)
 {
     notify_post(NOTIFY_DISMISSAL_HUD);
@@ -77,10 +66,6 @@ void SetHUDEnabled(BOOL isEnabled)
     posix_spawnattr_set_persona_uid_np(&attr, 0);
     posix_spawnattr_set_persona_gid_np(&attr, 0);
 #endif
-
-    // Removed LaunchDaemon check and logic block
-    // if (access(LAUNCH_DAEMON_PATH, F_OK) == 0)
-    // { ... }
 
     static char *executablePath = NULL;
     uint32_t executablePathSize = 0;
@@ -102,7 +87,6 @@ void SetHUDEnabled(BOOL isEnabled)
         }
 
         posix_spawnattr_destroy(&attr);
-        // free(executablePath); // Static variable, should not be freed here if intended for reuse across calls
 
         if (rc != 0) {
             return;
@@ -142,13 +126,3 @@ void SetHUDEnabled(BOOL isEnabled)
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 }
-
-// Removed SimulateMemoryPressure function
-// #if DEBUG
-// void SimulateMemoryPressure(void)
-// { ... }
-// #endif
-
-// Removed GetStandardUserDefaults function
-// NSUserDefaults *GetStandardUserDefaults(void)
-// { ... }

@@ -1,36 +1,14 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <os/log.h>
-#import "HUDHelper.h" // Import for global definitions like GetStandardUserDefaults
+#import "HUDHelper.h"
 
-// Basic logging macros (adjust as needed)
 #define log_debug(log, format, ...) os_log_debug(log, format, ##__VA_ARGS__)
 #define log_info(log, format, ...) os_log_info(log, format, ##__VA_ARGS__)
 #define log_error(log, format, ...) os_log_error(log, format, ##__VA_ARGS__)
 
-// Define JBROOT_PATH_NSSTRING if needed by copied code (adapt if necessary)
-#ifndef JBROOT_PATH_NSSTRING
-#define JBROOT_PATH_NSSTRING(path) @(path)
-#endif
-#ifndef JBROOT_PATH_CSTRING
-#define JBROOT_PATH_CSTRING(path) (path)
-#endif
-
-// Define User Defaults Path if needed by copied code
-// #define USER_DEFAULTS_PATH "/var/mobile/Library/Preferences/com.user.redsquarehud.prefs.plist" // Removed
-
-// Define Notification names if needed
-// #define NOTIFY_RELOAD_HUD "com.user.redsquarehud.reloadhud" // Removed
-#define NOTIFY_RELOAD_APP "com.user.redsquarehud.reloadapp"
 #define NOTIFY_LAUNCHED_HUD "com.user.redsquarehud.launchedhud"
 #define NOTIFY_DISMISSAL_HUD "com.user.redsquarehud.dismissalhud"
 static NSString * const kToggleHUDVisibilityNotificationName = @"com.yourcompany.simplehud.toggleVisibility";
-// #define kToggleHUDAfterLaunchNotificationName @"com.user.redsquarehud.toggleAfterLaunch" // Removed
-// #define kToggleHUDAfterLaunchNotificationActionKey @"action" // Removed
-// #define kToggleHUDAfterLaunchNotificationActionToggleOn @"on" // Removed
-// #define kToggleHUDAfterLaunchNotificationActionToggleOff @"off" // Removed
 
 #define FADE_OUT_DURATION 0.25
-// Removed User Defaults Keys definitions
-// typedef NSString * HUDUserDefaultsKey;
-// static HUDUserDefaultsKey const ...

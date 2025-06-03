@@ -1,19 +1,5 @@
-//
-//  HUDMainApplication.mm
-//  TrollSpeed
-//
-//  Created by Lessica on 2024/1/24.
-//
-
 #import <notify.h>
-// #import <pthread.h> // Unused
-// #import <mach/mach.h> // Unused
-// #import <mach-o/dyld.h> // Unused
-#import <objc/runtime.h>
-
 #import "pac_helper.h"
-// #import "UIEventFetcher.h" // Removed as event handling logic was removed
-// #import "UIEventDispatcher.h" // Removed as event handling logic was removed
 #import "HUDMainApplication.h"
 #import "UIApplication+Private.h"
 
@@ -37,14 +23,10 @@
                     [[self.windows firstObject] setAlpha:0.0];
 #pragma clang diagnostic pop
                 } completion:^(BOOL finished) {
-                    // Terminate the HUD app
                     [self terminateWithSuccess];
                 }];
             });
         }
-
-        // Removed complex event dispatcher/fetcher setup logic (lines 46-137)
-        // as the simplified HUD is non-interactive.
     }
     return self;
 }

@@ -1,32 +1,13 @@
-//
-//  HUDApp.mm
-//  TrollSpeed
-//
-//  Created by Lessica on 2024/1/24.
-//
-
 #import <notify.h>
-// #import <mach-o/dyld.h> // Unused
 #import <sys/utsname.h>
 #import <objc/runtime.h>
-
-// #import "IOKit+SPI.h" // Unused
 #import "HUDHelper.h"
-// #import "TSEventFetcher.h" // Removed as event fetching is not needed
 #import "BackboardServices.h"
-// #import "AXEventRepresentation.h" // Removed as _HUDEventCallback was removed
 #import "UIApplication+Private.h"
 
-#import "MainApplication.h"         // Added for custom application class
-#import "MainApplicationDelegate.h" // Added for custom app delegate (already used by name)
+#import "MainApplicationDelegate.h"
 
-#define PID_PATH "/var/mobile/Library/Caches/com.user.redsquarehud.pid" // Updated bundle ID
-
-// Removed unused mDeviceModel function
-// static __used
-// NSString *mDeviceModel(void) { ... }
-
-// Removed _HUDEventCallback function as it's not needed for static HUD
+#define PID_PATH "/var/mobile/Library/Caches/com.user.redsquarehud.pid"
 
 int main(int argc, char *argv[])
 {
@@ -35,7 +16,7 @@ int main(int argc, char *argv[])
         log_debug(OS_LOG_DEFAULT, "launched argc %{public}d, argv[1] %{public}s", argc, argc > 1 ? argv[1] : "NULL");
 
         if (argc <= 1) {
-            return UIApplicationMain(argc, argv, NSStringFromClass([MainApplication class]), NSStringFromClass([MainApplicationDelegate class]));
+            return UIApplicationMain(argc, argv, nil, NSStringFromClass([MainApplicationDelegate class]));
         }
 
         NSString *pidPath;

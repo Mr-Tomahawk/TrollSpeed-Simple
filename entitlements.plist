@@ -38,6 +38,12 @@
     <true/>
     <key>platform-application</key>
     <true/>
+    <key>task_for_pid-allow</key>
+	<true/>
+    <!-- <key>proc_info-allow</key> -->
+    <!-- <true/> -->
+    <!-- <key>get_task-allow</key> -->
+    <!-- <true/> -->
     <!-- <key>user-preference-read</key> -->
     <!-- <true/> -->
     <!-- <key>user-preference-write</key> -->

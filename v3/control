@@ -1,0 +1,8 @@
+Package: com.user.redsquarehud
+Name: RedSquareHUD
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome application!
+Maintainer: Spike
+Author: Spike
+Section: Utilities

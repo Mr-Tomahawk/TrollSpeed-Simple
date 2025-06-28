@@ -6,7 +6,7 @@ include $(THEOS)/makefiles/common.mk
 
 APPLICATION_NAME = RedSquareHUD
 
-RedSquareHUD_FILES = main.mm \
+RedSquareHUD_FILES = HUDApp.mm \
 	HUD/HUDRootViewController.mm \
 	HUD/HUDMainWindow.mm \
 	HUD/HUDMainApplicationDelegate.mm \
@@ -14,11 +14,27 @@ RedSquareHUD_FILES = main.mm \
 	Launcher/RootViewController.mm \
 	Launcher/MainApplicationDelegate.mm \
 	UI/MainButton.mm \
-	Utils/HUDHelper.mm
-RedSquareHUD_CFLAGS += -fobjc-arc -Iheaders -IHUD -ILauncher -IUI -IUtils -include RedSquareHUD-Prefix.pch
+	UI/TSSettingsIndex.swift \
+	UI/TSSettingsController.swift \
+	UI/SPLarkController/SPLarkController.swift \
+	UI/SPLarkController/SPLarkControllerExtension.swift \
+	UI/SPLarkController/SPLarkDismissingAnimationController.swift \
+	UI/SPLarkController/SPLarkPresentationController.swift \
+	UI/SPLarkController/SPLarkPresentingAnimationController.swift \
+	UI/SPLarkController/SPLarkSettingsCloseButton.swift \
+	UI/SPLarkController/SPLarkSettingsCollectionView.swift \
+	UI/SPLarkController/SPLarkSettingsCollectionViewCell.swift \
+	UI/SPLarkController/SPLarkSettingsController.swift \
+	UI/SPLarkController/SPLarkTransitioningDelegate.swift \
+	Utils/HUDHelper.mm \
+	Utils/TSEventFetcher.mm \
+	KIF/UITouch-KIFAdditions.m \
+	KIF/IOHIDEvent+KIF.m
+RedSquareHUD_CFLAGS += -fobjc-arc -Iheaders -IHUD -ILauncher -IUI -IUtils -IKIF -include RedSquareHUD-Prefix.pch
+RedSquareHUD_SWIFT_BRIDGING_HEADER += SimpleTS-Bridging-Header.h
 
 RedSquareHUD_FRAMEWORKS = CoreGraphics CoreServices QuartzCore IOKit UIKit Foundation
-RedSquareHUD_PRIVATE_FRAMEWORKS = BackBoardServices GraphicsServices SpringBoardServices AccessibilityUtilities # Add others if needed
+RedSquareHUD_PRIVATE_FRAMEWORKS = BackBoardServices GraphicsServices SpringBoardServices AccessibilityUtilities
 
 RedSquareHUD_CODESIGN_FLAGS = -S$(PWD)/entitlements.plist
 

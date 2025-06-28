@@ -2,6 +2,7 @@
 #import <notify.h>
 #import <mach-o/dyld.h>
 #import "HUDHelper.h"
+#import "NSUserDefaults+Private.h"
 
 extern "C" char **environ;
 
@@ -125,4 +126,27 @@ void SetHUDEnabled(BOOL isEnabled)
             }
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
+}
+
+#if DEBUG
+void SimulateMemoryPressure(void)
+{
+    // Simplified implementation for SimpleTS
+}
+#endif
+
+NSUserDefaults *GetStandardUserDefaults(void)
+{
+    static NSUserDefaults *_userDefaults = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSString *containerPath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject] stringByDeletingLastPathComponent];
+        NSURL *containerURL = [NSURL fileURLWithPath:containerPath];
+        _userDefaults = [[NSUserDefaults alloc] _initWithSuiteName:nil container:containerURL];
+        [_userDefaults registerDefaults:@{
+            @"touch_enabled": @YES,
+            @"orientation_follow_enabled": @YES,
+        }];
+    });
+    return _userDefaults;
 }

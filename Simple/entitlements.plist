@@ -10,14 +10,19 @@
     <true/>
     <key>com.apple.backboard.client</key>
     <true/>
-    <!-- <key>com.apple.private.allow-background-haptics</key> -->
-    <!-- <true/> -->
-    <!-- HID entitlements likely not needed for static square -->
-    <!-- <key>com.apple.private.hid.client.event-dispatch</key> <true/> -->
-    <!-- <key>com.apple.private.hid.client.event-filter</key> <true/> -->
-    <!-- <key>com.apple.private.hid.client.event-monitor</key> <true/> -->
-    <!-- <key>com.apple.private.hid.client.service-protected</key> <true/> -->
-    <!-- <key>com.apple.private.hid.manager.client</key> <true/> -->
+    <key>com.apple.private.allow-background-haptics</key>
+    <true/>
+    <!-- HID entitlements required for touch support -->
+    <key>com.apple.private.hid.client.event-dispatch</key>
+    <true/>
+    <key>com.apple.private.hid.client.event-filter</key>
+    <true/>
+    <key>com.apple.private.hid.client.event-monitor</key>
+    <true/>
+    <key>com.apple.private.hid.client.service-protected</key>
+    <true/>
+    <key>com.apple.private.hid.manager.client</key>
+    <true/>
     <key>com.apple.private.kernel.jetsam</key>
     <true/>
     <key>com.apple.private.memorystatus</key>
@@ -26,8 +31,8 @@
     <true/>
     <key>com.apple.private.security.no-sandbox</key>
     <true/>
-    <!-- <key>com.apple.springboard.CFUserNotification</key> -->
-    <!-- <true/> -->
+    <key>com.apple.springboard.CFUserNotification</key>
+    <true/>
     <key>com.apple.springboard.accessibility-window-hosting</key>
     <true/>
     <key>com.apple.springboard.appbackgroundstyle</key>
@@ -38,9 +43,9 @@
     <true/>
     <key>platform-application</key>
     <true/>
-    <!-- <key>user-preference-read</key> -->
-    <!-- <true/> -->
-    <!-- <key>user-preference-write</key> -->
-    <!-- <true/> -->
+    <key>user-preference-read</key>
+    <true/>
+    <key>user-preference-write</key>
+    <true/>
 </dict>
 </plist>

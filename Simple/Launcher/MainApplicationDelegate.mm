@@ -6,11 +6,10 @@
 //
 
 #import "MainApplicationDelegate.h"
-#import "MainApplication.h" // This will be the new Simple/MainApplication.h
-#import "RootViewController.h" // This is Simple/RootViewController.h
-#import "HUDHelper.h" // This is Simple/HUDHelper.h
+#import "MainApplication.h" 
+#import "RootViewController.h" 
+#import "HUDHelper.h" 
 
-// Logging macros (e.g., log_debug) are expected to be defined in RedSquareHUD-Prefix.pch
 
 @implementation MainApplicationDelegate {
     RootViewController *_rootViewController;
@@ -25,7 +24,7 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
-    if ([url.scheme isEqualToString:@"trollspeed"]) { // Using "trollspeed" scheme from Speed project
+    if ([url.scheme isEqualToString:@"trollspeed"]) { 
         if ([url.host isEqualToString:@"toggle"]) {
             [self setupAndNotifyToggleHUDAfterLaunchWithAction:nil];
             return YES;
@@ -57,13 +56,10 @@
 
 - (void)setupAndNotifyToggleHUDAfterLaunchWithAction:(NSString *)action
 {
-    // This static method [RootViewController setShouldToggleHUDAfterLaunch:YES]
-    // will need to exist in Simple/RootViewController.
-    // If not, it will cause a build error, and we will add it.
+    
     [RootViewController setShouldToggleHUDAfterLaunch:YES];
     
-    // kToggleHUDAfterLaunchNotificationName and kToggleHUDAfterLaunchNotificationActionKey
-    // should be available via RootViewController.h
+    
     if (action) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kToggleHUDAfterLaunchNotificationName object:nil userInfo:@{
             kToggleHUDAfterLaunchNotificationActionKey: action,

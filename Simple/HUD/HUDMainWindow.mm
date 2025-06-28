@@ -12,7 +12,7 @@
 
 + (BOOL)_isSystemWindow { return YES; }
 - (BOOL)_isWindowServerHostingManaged { return NO; }
-- (BOOL)_ignoresHitTest { return YES; } // HUD is non-interactive
+- (BOOL)_ignoresHitTest { return NO; } // HUD is interactive for dragging
 - (BOOL)_isSecure { return YES; }
 - (BOOL)_shouldCreateContextAsSecure { return YES; }
 

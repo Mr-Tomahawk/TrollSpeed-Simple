@@ -9,17 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// User Defaults Key definitions moved to RedSquareHUD-Prefix.pch
-
 OBJC_EXTERN BOOL IsHUDEnabled(void);
 OBJC_EXTERN void SetHUDEnabled(BOOL isEnabled);
 
-// Removed SimulateMemoryPressure declaration
-// #if DEBUG
-// OBJC_EXTERN void SimulateMemoryPressure(void);
-// #endif
+#if DEBUG
+OBJC_EXTERN void SimulateMemoryPressure(void);
+#endif
 
-// Removed GetStandardUserDefaults declaration
-// OBJC_EXTERN NSUserDefaults *GetStandardUserDefaults(void);
+OBJC_EXTERN NSUserDefaults *GetStandardUserDefaults(void);
 
 NS_ASSUME_NONNULL_END

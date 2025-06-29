@@ -6,4 +6,4 @@ v2.2 is a more advanced launcher that does not crash, and draws red rectangle wi
 
 v3 has memory classes for interacting with process memory, credit to @bphucc
 
-All content for educational purposes
+All content for educational purposes, read releases page
